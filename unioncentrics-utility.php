@@ -16,7 +16,11 @@
 
 function ucu_register_settings() {
 	add_option( 'ucu_um_allow_edit_email', 'on' );
+	add_option( 'ucu_add_profile_nav_buttons', 'on' );
+	add_option( 'ucu_show_um_profile_nav_titles', 'on' );
 	register_setting( 'ucu_options_group', 'ucu_um_allow_edit_email', 'ucu_callback' );
+	register_setting( 'ucu_options_group', 'ucu_add_profile_nav_buttons', 'ucu_callback' );
+	register_setting( 'ucu_options_group', 'ucu_show_um_profile_nav_titles', 'ucu_callback' );
 }
 add_action( 'admin_init', 'ucu_register_settings' );
 
@@ -67,6 +71,22 @@ function ucu_options_page() {
 							<p class="description">Ultimate Member hides the email field from the profile by default, even if it's in the profile form.</p>
 					</td>
 				</tr>
+				<tr>
+					<th scope="row">Edit Password on UM Profile Nav</th>
+					<td>
+					<label for="ucu_add_profile_nav_buttons">
+						<input type="checkbox" id="ucu_add_profile_nav_buttons" name="ucu_add_profile_nav_buttons" <?php echo get_option( 'ucu_add_profile_nav_buttons' ) === 'on' ? 'checked' : ''; ?> />
+						Add Password and Privacy Edit buttons to Profile navigation.</label>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Titles UM Profile Nav Buttons</th>
+					<td>
+					<label for="ucu_show_um_profile_nav_titles">
+						<input type="checkbox" id="ucu_show_um_profile_nav_titles" name="ucu_show_um_profile_nav_titles" <?php echo get_option( 'ucu_show_um_profile_nav_titles' ) === 'on' ? 'checked' : ''; ?> />
+						Show nav titles on UM Profile</label>
+					</td>
+				</tr>
 			</table>
 			<?php submit_button(); ?>
 		</form>
@@ -88,3 +108,36 @@ function ucu_um_restricted_fields( $arr_restricted_fields ) {
 	return $arr_restricted_fields;
 }
 add_filter( 'um_user_profile_restricted_edit_fields', 'ucu_um_restricted_fields' );
+
+
+/**
+ * Add buttons to navigation of User Profile section
+ */
+add_action( 'wp_footer', 'ucu_add_profile_nav_buttons', 1000 );
+function ucu_add_profile_nav_buttons() {
+	if ( get_option('ucu_add_profile_nav_buttons') !== 'on' ) return false;
+	$change_password_html = '<div class="um-profile-nav-item um-profile-nav-password"><a data-tab="password" href="' . get_site_url() . '/account/password/" class="um-account-link current"><span class="um-account-icontip uimob800-show um-tip-n" original-title="Change Password"><i class="um-faicon-asterisk"></i></span><span class="um-account-icon uimob800-hide"><i class="um-faicon-asterisk"></i></span><span class="um-account-title uimob800-hide title">Change Password</span></a></div>';
+
+	$account_privacy_html = '<div class="um-profile-nav-item um-profile-nav-password"><a data-tab="privacy" href="' . get_site_url() . '/account/privacy/" class="um-account-link"><span class="um-account-icontip uimob800-show um-tip-n" original-title="Privacy"><i class="um-faicon-lock"></i></span><span class="um-account-icon uimob800-hide"><i class="um-faicon-lock"></i></span><span class="um-account-title uimob800-hide title">Privacy</span></a></div>';
+	if ( function_exists( 'um_profile_id' ) ) {
+		if ( um_profile_id() === get_current_user_id() ) :
+			?>
+			<script>
+				jQuery('.um-profile-nav-item').last().after('<?php echo wp_kses_post( $change_password_html . $account_privacy_html ); ?>');
+				</script>
+			<?php
+		endif;
+	}
+}
+
+add_action( 'wp_head', 'ucu_show_um_profile_nav_titles' );
+function ucu_show_um_profile_nav_titles() {
+	if ( get_option('ucu_show_um_profile_nav_titles') !== 'on' ) return false;
+	?>
+	<style>
+	.um-page-user .um-profile-nav-item .title {
+		display: block !important;
+	}
+	</style>
+	<?php
+}
