@@ -25,7 +25,7 @@ function ucu_register_settings() {
 add_action( 'admin_init', 'ucu_register_settings' );
 
 function ucu_register_options_page() {
-	add_options_page( 'UnionCentrics Utilities', 'UnionCentrics', 'manage_options', 'ucu', 'ucu_options_page' );
+	add_options_page( 'UnionCentrics Utilities', 'UnionCentrics Utilities', 'manage_options', 'ucu', 'ucu_options_page' );
 }
 add_action( 'admin_menu', 'ucu_register_options_page' );
 
