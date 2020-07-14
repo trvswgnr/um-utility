@@ -3,7 +3,7 @@
  * Plugin Name: UnionCentrics - Utility
  * Plugin URI: https://github.com/icentrics/unioncentrics-utility
  * Description: Utility plugin for UnionCentrics
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: UnionCentrics
  * Author URI: http://unioncentrics.com
  *
