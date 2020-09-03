@@ -9,7 +9,8 @@
  *
  * @package unioncentrics-utility
  * @author Travis Aaron Wagner
- * @todo: move functions to class.
+ *
+ * @todo move functions to class.
  */
 
 /**
