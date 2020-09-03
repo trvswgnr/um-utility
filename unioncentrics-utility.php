@@ -3,7 +3,7 @@
  * Plugin Name: UnionCentrics - Utility
  * Plugin URI: https://github.com/icentrics/unioncentrics-utility
  * Description: Utility plugin for UnionCentrics
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: UnionCentrics
  * Author URI: http://unioncentrics.com
  *
@@ -107,7 +107,7 @@ function ucu_options_page() {
 					<label for="remove_member_role">Remove User Role</label>
 				</th>
 				<td>
-					<input type="text" size="40" id="remove_member_role" name="remove_member_role" value="" placeholder="User role slug (e.g. um_general-member)">
+					<input type="text" size="40" id="remove_member_role" name="remove_member_role" value="um_general-member" placeholder="User role slug (e.g. um_general-member)">
 					<input type="submit" name="submit_remove_member_role" id="remove_member_role" class="button" value="Remove" onclick="return getElementById('remove_member_role').value ? confirm( 'Are you sure you want to delete the role ' + getElementById('remove_member_role').value + '?' ) : '';">
 					<p class="description">Remove a user role—this will need to be added back through Ultimate Member or otherwise.<br>(Fixes an issue where General Members are unable to edit their profile)</p>
 				</td>
