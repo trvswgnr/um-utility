@@ -45,6 +45,8 @@ function ucu_remove_member_role() {
 		return false;
 	}
 
+	$wp_roles = new WP_Roles();
+
 	$notice_type = 'success';
 
 	if ( empty( $_POST['remove_member_role'] ) ) {
@@ -58,12 +60,16 @@ function ucu_remove_member_role() {
 		$notice_type = 'error no-admin';
 	}
 
-	$wp_roles = new WP_Roles();
+	if ( empty( $wp_roles->roles[ $role_to_remove ] ) && 'error no-user' !== $notice_type ) {
+		$notice_type    = 'error no-role';
+		$notice_message = 'Error removing user role "' . $role_to_remove . '": User role does not exist.';
+	}
 
 	if ( ! empty( $wp_roles->roles[ $role_to_remove ] ) && 'success' === $notice_type ) {
 		try {
 			$notice_message = 'User role "' . $role_to_remove . '" (' . $wp_roles->roles[ $role_to_remove ]['name'] . ') was removed successfully.';
 			if ( strpos( $role_to_remove, 'um_' ) !== false ) {
+				$notice_type     = 'warning um-role';
 				$notice_message .= '<br>Since this is an Ultimate Member role you now may need to delete the role <a href="' . site_url( '/wp-admin/admin.php?page=um_roles' ) . '">here.</a>';
 			}
 			$wp_roles->remove_role( $role_to_remove );
@@ -72,13 +78,8 @@ function ucu_remove_member_role() {
 		}
 	}
 
-	if ( empty( $wp_roles->roles[ $role_to_remove ] ) ) {
-		$notice_type    = 'error no-role';
-		$notice_message = 'Error removing user role "' . $role_to_remove . '": User role does not exist.';
-	}
-
 	if ( 'error no-user' === $notice_type ) {
-		$notice_message = 'Please enter a user role slug.';
+		$notice_message = 'Please select a user role.';
 	}
 
 	if ( 'error no-admin' === $notice_type ) {
@@ -95,6 +96,7 @@ function ucu_remove_member_role() {
  * Options page display
  */
 function ucu_options_page() {
+	$wp_roles = new WP_Roles();
 	?>
 	<div class="wrap">
 		<h1 class="wp-heading-inline">UnionCentrics Utilities</h1>
@@ -107,8 +109,19 @@ function ucu_options_page() {
 					<label for="remove_member_role">Remove User Role</label>
 				</th>
 				<td>
-					<input type="text" size="40" id="remove_member_role" name="remove_member_role" value="um_general-member" placeholder="User role slug (e.g. um_general-member)">
-					<input type="submit" name="submit_remove_member_role" id="remove_member_role" class="button" value="Remove" onclick="return getElementById('remove_member_role').value ? confirm( 'Are you sure you want to delete the role ' + getElementById('remove_member_role').value + '?' ) : '';">
+					<select name="remove_member_role" id="remove_member_role">
+						<option value="" selected="selected">Select a role</option>
+						<?php foreach ( $wp_roles->roles as $slug => $role ) : ?>
+							<?php
+							$disabled = '';
+							if ( strpos( $slug, 'admin' ) !== false ) {
+								$disabled = 'disabled';
+							}
+							?>
+								<option value="<?php echo esc_attr( $slug ); ?>" <?php echo esc_attr( $disabled ); ?>><?php echo esc_html( $role['name'] ); ?> (<?php echo esc_html( $slug ); ?>)</option>
+						<?php endforeach; ?>
+					</select>
+					<input type="submit" name="submit_remove_member_role" id="submit_remove_member_role" class="button" value="Remove" onclick="return getElementById('remove_member_role').value ? confirm( 'Are you sure you want to delete the role ' + getElementById('remove_member_role').value + '?' ) : '';">
 					<p class="description">Remove a user role—this will need to be added back through Ultimate Member or otherwise.<br>(Fixes an issue where General Members are unable to edit their profile)</p>
 				</td>
 			</tr>
