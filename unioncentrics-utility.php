@@ -46,6 +46,7 @@ function ucu_remove_member_role() {
 	}
 
 	$wp_roles = new WP_Roles();
+	$um_roles = get_option( 'um_roles' );
 
 	$notice_type = 'success';
 
@@ -67,14 +68,29 @@ function ucu_remove_member_role() {
 
 	if ( ! empty( $wp_roles->roles[ $role_to_remove ] ) && 'success' === $notice_type ) {
 		try {
-			$notice_message = 'User role "' . $role_to_remove . '" (' . $wp_roles->roles[ $role_to_remove ]['name'] . ') was removed successfully.';
-			if ( strpos( $role_to_remove, 'um_' ) !== false ) {
-				$notice_type     = 'warning um-role';
-				$notice_message .= '<br>Since this is an Ultimate Member role you now may need to delete the role <a href="' . site_url( '/wp-admin/admin.php?page=um_roles' ) . '">here.</a>';
-			}
+			$role_to_remove_name = $wp_roles->roles[ $role_to_remove ]['name'];
+
+			// remove the role.
 			$wp_roles->remove_role( $role_to_remove );
+
+			$notice_message = 'User role "' . $role_to_remove . '" (' . $role_to_remove_name . ') was removed successfully.';
+
+			if ( strpos( $role_to_remove, 'um_' ) !== false ) {
+				$um_slug     = str_replace( 'um_', '', $role_to_remove );
+				if ( in_array( $um_slug, $um_roles, true ) ) {
+					$notice_type = 'success um-role';
+					// drop role from the array.
+					unset( $um_roles[ array_search( $um_slug, $um_roles, true ) ] );
+					// add it back to update the roles.
+					update_option( 'um_roles', $um_roles );
+					$notice_message .= '<br>Also deleted Ultimate Member role "' . $um_slug . '".';
+				} else {
+					$notice_type     = 'warning no-matching-um-role';
+					$notice_message .= '<br>No matching Ultimate Member role found, please contact your friendly developer for assistance.';
+				}
+			}
 		} catch ( Exception $e ) {
-			$notice_message = 'Critical error removing user role "' . $role_to_remove . '": ' . $e->getMessage();
+			$notice_message = 'Critical error removing user role "' . $role_to_remove . '": ' . $e->getMessage() . '<br>Please contact your friendly developer for assistance.';
 		}
 	}
 
@@ -96,11 +112,13 @@ function ucu_remove_member_role() {
  * Options page display
  */
 function ucu_options_page() {
-	$wp_roles = new WP_Roles();
 	?>
 	<div class="wrap">
 		<h1 class="wp-heading-inline">UnionCentrics Utilities</h1>
-		<?php ucu_remove_member_role(); ?>
+		<?php
+		ucu_remove_member_role();
+		$wp_roles = ( new WP_Roles() )->roles;
+		?>
 		<form method="post" action="">
 			<h3>Ultimate Member Fixes</h3>
 			<table class="form-table">
@@ -111,7 +129,7 @@ function ucu_options_page() {
 				<td>
 					<select name="remove_member_role" id="remove_member_role">
 						<option value="" selected="selected">Select a role</option>
-						<?php foreach ( $wp_roles->roles as $slug => $role ) : ?>
+						<?php foreach ( $wp_roles as $slug => $role ) : ?>
 							<?php
 							$disabled = '';
 							if ( strpos( $slug, 'admin' ) !== false ) {
