@@ -34,36 +34,6 @@ function ucu_register_options_page() {
 }
 add_action( 'admin_menu', 'ucu_register_options_page' );
 
-// simply adds a button style that we need.
-add_action(
-	'admin_head',
-	function() {
-		if ( empty( $_GET['page'] ) || ( ! empty( $_GET['page'] && 'ucu' !== filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING ) ) ) ) {
-			return;
-		}
-		?>
-		<style>
-		.wp-core-ui .button-danger {
-			color: #a00;
-			border-color: #a00;
-			background: #f3f5f6;
-			vertical-align: top;
-		}
-		.wp-core-ui .button-danger:hover {
-			background: #f1f1f1;
-			border-color: #dc3232;
-			color: #dc3232;
-		}
-		.wp-core-ui .button-danger:focus {
-			border-color: #f1f1f1;
-			color: #dc3232;
-			box-shadow: 0 0 0 1px #dc3232;
-		}
-		</style>
-		<?php
-	}
-);
-
 /**
  * Remove user role
  *
@@ -268,3 +238,33 @@ function ucu_show_um_profile_nav_titles() {
 	<?php
 }
 add_action( 'wp_head', 'ucu_show_um_profile_nav_titles' );
+
+// simply adds a button style that we need.
+add_action(
+	'admin_head',
+	function() {
+		if ( empty( $_GET['page'] ) || ( ! empty( $_GET['page'] && 'ucu' !== filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING ) ) ) ) {
+			return;
+		}
+		?>
+		<style>
+		.wp-core-ui .button-danger {
+			color: #a00;
+			border-color: #a00;
+			background: #f3f5f6;
+			vertical-align: top;
+		}
+		.wp-core-ui .button-danger:hover {
+			background: #f1f1f1;
+			border-color: #dc3232;
+			color: #dc3232;
+		}
+		.wp-core-ui .button-danger:focus {
+			border-color: #f1f1f1;
+			color: #dc3232;
+			box-shadow: 0 0 0 1px #dc3232;
+		}
+		</style>
+		<?php
+	}
+);
