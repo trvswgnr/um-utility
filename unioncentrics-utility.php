@@ -34,6 +34,36 @@ function ucu_register_options_page() {
 }
 add_action( 'admin_menu', 'ucu_register_options_page' );
 
+// simply adds a button style that we need.
+add_action(
+	'admin_head',
+	function() {
+		if ( empty( $_GET['page'] ) || ( ! empty( $_GET['page'] && 'ucu' !== filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING ) ) ) ) {
+			return;
+		}
+		?>
+		<style>
+		.wp-core-ui .button-danger {
+			color: #a00;
+			border-color: #a00;
+			background: #f3f5f6;
+			vertical-align: top;
+		}
+		.wp-core-ui .button-danger:hover {
+			background: #f1f1f1;
+			border-color: #dc3232;
+			color: #dc3232;
+		}
+		.wp-core-ui .button-danger:focus {
+			border-color: #f1f1f1;
+			color: #dc3232;
+			box-shadow: 0 0 0 1px #dc3232;
+		}
+		</style>
+		<?php
+	}
+);
+
 /**
  * Remove user role
  *
@@ -76,7 +106,7 @@ function ucu_remove_member_role() {
 			$notice_message = 'User role "' . $role_to_remove . '" (' . $role_to_remove_name . ') was removed successfully.';
 
 			if ( strpos( $role_to_remove, 'um_' ) !== false ) {
-				$um_slug     = str_replace( 'um_', '', $role_to_remove );
+				$um_slug = str_replace( 'um_', '', $role_to_remove );
 				if ( in_array( $um_slug, $um_roles, true ) ) {
 					$notice_type = 'success um-role';
 					// drop role from the array.
@@ -139,7 +169,7 @@ function ucu_options_page() {
 								<option value="<?php echo esc_attr( $slug ); ?>" <?php echo esc_attr( $disabled ); ?>><?php echo esc_html( $role['name'] ); ?> (<?php echo esc_html( $slug ); ?>)</option>
 						<?php endforeach; ?>
 					</select>
-					<input type="submit" name="submit_remove_member_role" id="submit_remove_member_role" class="button" value="Remove" onclick="return getElementById('remove_member_role').value ? confirm( 'Are you sure you want to delete the role ' + getElementById('remove_member_role').value + '?' ) : '';">
+					<input type="submit" name="submit_remove_member_role" id="submit_remove_member_role" class="button button-danger" value="Remove" onclick="return getElementById('remove_member_role').value ? confirm( 'Are you sure you want to delete the role ' + getElementById('remove_member_role').value + '?' ) : '';">
 					<p class="description">Remove a user role—this will need to be added back through Ultimate Member or otherwise.<br>(Fixes an issue where General Members are unable to edit their profile)</p>
 				</td>
 			</tr>
