@@ -8,7 +8,7 @@
  * Author URI: http://unioncentrics.com
  *
  * @package unioncentrics-utility
- * @author Travis Aaron Wagner
+ * @author Travis Aaron Wagner <travis@travisaw.com>
  *
  * @todo move functions to class.
  */
